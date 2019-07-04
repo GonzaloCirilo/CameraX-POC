@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.graphics.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.util.Rational
 import android.util.Size
@@ -14,6 +16,7 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -21,6 +24,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS =  arrayOf(Manifest.permission.CAMERA)
 
 class MainActivity : AppCompatActivity(), LifecycleOwner {
+
+    lateinit var adapter: ReelAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +41,43 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
         view_finder.addOnLayoutChangeListener{ _, _, _, _, _, _, _, _, _ ->
             updateTransform()
         }
+
+
+
+        if (ContextCompat.checkSelfPermission(applicationContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1)
+            }
+        } else {
+            adapter = ReelAdapter(ImageLoader.loadSavedImages(
+                arrayOf(
+                    File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).path+"/Camera"),
+                    File(
+                        externalMediaDirs.first().path
+                    )
+                    )
+            ).toList())
+
+            with(reel_recycler){
+                this.adapter = this@MainActivity.adapter
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            }
+        }
+
     }
 
     private fun startCamera() {
@@ -79,7 +121,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
 
         preview.setOnPreviewOutputUpdateListener {
             view_finder.surfaceTexture = it.surfaceTexture
-            Toast.makeText(this, "Permissions not granted by the user", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Bounded", Toast.LENGTH_SHORT)
                 .show()
             updateTransform()
         }
@@ -143,4 +185,6 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
         }
         return true
     }
+
+
 }
