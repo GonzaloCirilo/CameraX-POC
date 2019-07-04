@@ -6,6 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/reel_recycler"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     <TextureView
             android:id="@+id/view_finder"
