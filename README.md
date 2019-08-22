@@ -1,5 +1,5 @@
 # CameraX-POC
-Proof of Concept using the new jetpack API [CameraX] (https://developer.android.com/training/camerax)  developed by Google 
+Proof of Concept using the new jetpack API [CameraX](https://developer.android.com/training/camerax)  developed by Google 
 
 #### TODO
 * Gallery (In progress)
